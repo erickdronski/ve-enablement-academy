@@ -15,17 +15,20 @@ export default function Sidebar() {
 
   const nav = (
     <div className="flex flex-col h-full">
-      <Link href="/" className="block px-6 py-5 border-b border-[#1a1a1a]" onClick={() => setOpen(false)}>
-        <span className="text-xl font-black bg-gradient-to-r from-[#00E6B9] to-[#06b6d4] bg-clip-text text-transparent">VE Academy</span>
+      <Link href="/" className="block px-6 py-5 border-b border-gray-100" onClick={() => setOpen(false)}>
+        <div className="flex items-center gap-2">
+          <span className="text-xl font-black text-[#E8192C]">ivanti</span>
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">VE Academy</span>
+        </div>
       </Link>
       <div className="flex-1 overflow-y-auto py-4">
         {tracks.map(track => (
           <div key={track.id} className="mb-2">
             <button onClick={() => setExpanded(expanded === track.id ? null : track.id)}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white transition-colors">
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm font-semibold text-gray-600 hover:text-[#1A1F36] transition-colors">
               <span>{track.icon}</span>
               <span className="truncate">{track.title}</span>
-              <span className="ml-auto text-xs">{expanded === track.id ? '▼' : '▶'}</span>
+              <span className="ml-auto text-xs text-gray-400">{expanded === track.id ? '▼' : '▶'}</span>
             </button>
             {expanded === track.id && (
               <div className="ml-4 space-y-0.5">
@@ -37,12 +40,12 @@ export default function Sidebar() {
                   return (
                     <div key={mod.id}>
                       {isLocked ? (
-                        <div className="flex items-center gap-2 px-4 py-1.5 text-xs text-gray-600">
+                        <div className="flex items-center gap-2 px-4 py-1.5 text-xs text-gray-300">
                           <span>🔒</span><span className="truncate">{mod.title}</span>
                         </div>
                       ) : (
                         <Link href={`/learn/${track.id}/${mod.id}`} onClick={() => setOpen(false)}
-                          className={`flex items-center gap-2 px-4 py-1.5 text-xs transition-colors rounded-r ${isActive ? 'text-[#00E6B9] border-l-2 border-[#00E6B9] bg-[#00E6B9]/5' : 'text-gray-400 hover:text-white'}`}>
+                          className={`flex items-center gap-2 px-4 py-1.5 text-xs transition-colors rounded-r ${isActive ? 'text-[#E8192C] border-l-2 border-[#E8192C] bg-red-50 font-semibold' : 'text-gray-500 hover:text-[#1A1F36]'}`}>
                           <span>{completed ? '✓' : '→'}</span><span className="truncate">{mod.title}</span>
                         </Link>
                       )}
@@ -54,8 +57,8 @@ export default function Sidebar() {
           </div>
         ))}
       </div>
-      <div className="border-t border-[#1a1a1a] p-4 space-y-2">
-        <Link href="/profile" onClick={() => setOpen(false)} className={`block text-sm px-2 py-1 rounded ${pathname === '/profile' ? 'text-[#00E6B9]' : 'text-gray-400 hover:text-white'}`}>
+      <div className="border-t border-gray-100 p-4 space-y-2">
+        <Link href="/profile" onClick={() => setOpen(false)} className={`block text-sm px-2 py-1 rounded ${pathname === '/profile' ? 'text-[#E8192C] font-semibold' : 'text-gray-500 hover:text-[#1A1F36]'}`}>
           👤 Profile
         </Link>
         <XPCounter />
@@ -65,16 +68,16 @@ export default function Sidebar() {
 
   return (
     <>
-      <button onClick={() => setOpen(!open)} className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-[#111] border border-[#222]">
+      <button onClick={() => setOpen(!open)} className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-lg bg-white border border-gray-200 shadow-sm">
         <span className="text-xl">{open ? '✕' : '☰'}</span>
       </button>
-      <aside className="hidden md:flex fixed top-0 left-0 h-screen w-[280px] bg-[#0a0a0a] border-r border-[#1a1a1a] flex-col z-40">
+      <aside className="hidden md:flex fixed top-0 left-0 h-screen w-[280px] bg-white border-r border-gray-100 flex-col z-40">
         {nav}
       </aside>
       {open && (
         <>
-          <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setOpen(false)} />
-          <aside className="fixed top-0 left-0 h-screen w-[280px] bg-[#0a0a0a] border-r border-[#1a1a1a] flex flex-col z-50 md:hidden">
+          <div className="fixed inset-0 bg-black/20 z-40 md:hidden" onClick={() => setOpen(false)} />
+          <aside className="fixed top-0 left-0 h-screen w-[280px] bg-white border-r border-gray-100 flex flex-col z-50 md:hidden shadow-2xl">
             {nav}
           </aside>
         </>

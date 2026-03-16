@@ -47,52 +47,43 @@ export default function ModulePage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      {/* Breadcrumb */}
-      <div className="text-sm text-gray-500 mb-6 flex items-center gap-2">
-        <Link href="/" className="hover:text-gray-300">Home</Link>
-        <span>/</span>
-        <Link href={`/learn/${trackId}`} className="hover:text-gray-300">{track.title}</Link>
-        <span>/</span>
-        <span className="text-gray-300">{mod.title}</span>
+      <div className="text-sm text-gray-400 mb-6 flex items-center gap-2">
+        <Link href="/" className="hover:text-[#1A1F36]">Home</Link><span>/</span>
+        <Link href={`/learn/${trackId}`} className="hover:text-[#1A1F36]">{track.title}</Link><span>/</span>
+        <span className="text-[#1A1F36]">{mod.title}</span>
       </div>
 
-      {/* Header */}
       <ScrollReveal>
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl font-black">{mod.title}</h1>
-            <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: track.color + '20', color: track.color }}>{mod.xpReward} XP</span>
+            <h1 className="text-3xl font-black text-[#1A1F36]">{mod.title}</h1>
+            <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: track.color + '15', color: track.color }}>{mod.xpReward} XP</span>
           </div>
           <div className="h-1 w-20 rounded-full" style={{ backgroundColor: track.color }} />
         </div>
       </ScrollReveal>
 
-      {/* Two column layout */}
       <div className="grid md:grid-cols-[1fr_320px] gap-8 mb-12">
-        {/* Content */}
         <div className="space-y-4">
           {mod.content.map((p, i) => (
             <ScrollReveal key={i} delay={i * 50}>
               {i % 3 === 2 ? (
-                <div className="border-l-4 pl-4 py-2 rounded-r-lg bg-[#111]" style={{ borderColor: track.color + '60' }}>
-                  <p className="text-gray-300 leading-relaxed">{p}</p>
+                <div className="border-l-4 pl-4 py-3 rounded-r-lg bg-gray-50" style={{ borderColor: track.color }}>
+                  <p className="text-gray-700 leading-relaxed">{p}</p>
                 </div>
               ) : (
-                <p className="text-gray-300 leading-relaxed">{p}</p>
+                <p className="text-gray-700 leading-relaxed">{p}</p>
               )}
             </ScrollReveal>
           ))}
         </div>
-
-        {/* Sidebar */}
         <div className="md:sticky md:top-24 self-start">
-          <div className="rounded-xl border border-[#222] bg-[#111] p-6">
-            <h4 className="font-bold mb-3 flex items-center gap-2">💡 Key Takeaways</h4>
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <h4 className="font-bold mb-3 text-[#1A1F36] flex items-center gap-2">💡 Key Takeaways</h4>
             <ul className="space-y-2">
               {mod.keyTakeaways.map((t, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
-                  <span className="mt-0.5" style={{ color: track.color }}>✓</span>
-                  <span>{t}</span>
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                  <span className="mt-0.5" style={{ color: track.color }}>✓</span><span>{t}</span>
                 </li>
               ))}
             </ul>
@@ -100,31 +91,28 @@ export default function ModulePage() {
         </div>
       </div>
 
-      {/* Flashcards */}
       {mod.flashcards.length > 0 && (
         <ScrollReveal>
-          <div className="mb-12 rounded-xl border border-[#222] bg-[#111] p-8">
-            <h3 className="text-xl font-bold mb-4">📝 Practice with Flashcards</h3>
+          <div className="mb-12 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+            <h3 className="text-xl font-bold mb-4 text-[#1A1F36]">📝 Practice with Flashcards</h3>
             <FlashcardDeck flashcards={mod.flashcards} />
           </div>
         </ScrollReveal>
       )}
 
-      {/* Quiz */}
       <ScrollReveal>
-        <div className="mb-12 rounded-xl border border-[#222] bg-[#111] p-8">
-          <h3 className="text-xl font-bold mb-4">🧠 Test Your Knowledge</h3>
+        <div className="mb-12 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm">
+          <h3 className="text-xl font-bold mb-4 text-[#1A1F36]">🧠 Test Your Knowledge</h3>
           {mounted && <QuizEngine questions={mod.quiz} moduleId={moduleId} trackId={trackId} onComplete={handleQuizComplete} />}
         </div>
       </ScrollReveal>
 
-      {/* Completion */}
       {quizPassed && !completed && (
         <ScrollReveal>
-          <div className="text-center py-8 rounded-xl border border-green-500/30 bg-green-500/5 mb-8">
+          <div className="text-center py-8 rounded-2xl border-2 border-green-200 bg-green-50 mb-8">
             <div className="text-4xl mb-2">🎉</div>
-            <h3 className="text-xl font-bold text-green-400 mb-4">Quiz Passed!</h3>
-            <button onClick={handleMarkComplete} className="px-8 py-3 rounded-lg font-bold text-black bg-[#00E6B9] hover:scale-105 transition-transform">
+            <h3 className="text-xl font-bold text-green-700 mb-4">Quiz Passed!</h3>
+            <button onClick={handleMarkComplete} className="px-8 py-3 rounded-lg font-bold text-white bg-[#E8192C] hover:bg-[#C41525] transition-all shadow-sm hover:scale-105">
               Mark Module Complete ✓
             </button>
           </div>
@@ -132,24 +120,23 @@ export default function ModulePage() {
       )}
 
       {completed && (
-        <div className="text-center py-8 rounded-xl border border-green-500/30 bg-green-500/5 mb-8">
+        <div className="text-center py-8 rounded-2xl border-2 border-green-200 bg-green-50 mb-8">
           <div className="text-4xl mb-2">✅</div>
-          <h3 className="text-xl font-bold text-green-400 mb-4">Module Complete!</h3>
+          <h3 className="text-xl font-bold text-green-700 mb-4">Module Complete!</h3>
           {nextModule ? (
-            <Link href={`/learn/${trackId}/${nextModule.id}`} className="inline-block px-6 py-3 rounded-lg font-semibold text-black bg-[#00E6B9] hover:scale-105 transition-transform">
+            <Link href={`/learn/${trackId}/${nextModule.id}`} className="inline-block px-6 py-3 rounded-lg font-semibold text-white bg-[#E8192C] hover:bg-[#C41525] transition-all shadow-sm">
               Next Module: {nextModule.title} →
             </Link>
           ) : (
-            <Link href={`/certificate/${trackId}`} className="inline-block px-6 py-3 rounded-lg font-semibold text-black bg-[#FFD700] hover:scale-105 transition-transform">
+            <Link href={`/certificate/${trackId}`} className="inline-block px-6 py-3 rounded-lg font-semibold text-white bg-[#FFAA00] hover:bg-[#E69900] transition-all shadow-sm">
               View Your Certificate 🏆
             </Link>
           )}
         </div>
       )}
 
-      {/* Nav */}
-      <div className="flex justify-between py-4">
-        <Link href={`/learn/${trackId}`} className="text-sm text-gray-400 hover:text-white">← Back to {track.title}</Link>
+      <div className="flex justify-between py-4 border-t border-gray-100 mt-8">
+        <Link href={`/learn/${trackId}`} className="text-sm text-gray-400 hover:text-[#1A1F36]">← Back to {track.title}</Link>
       </div>
     </div>
   );

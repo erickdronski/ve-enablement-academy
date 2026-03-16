@@ -12,9 +12,7 @@ export default function ProfilePage() {
   const [name, setName] = useState('');
   useEffect(() => { setMounted(true); setName(getProfile().name); }, []);
 
-  const handleNameBlur = () => { setProfile(name); };
-
-  if (!mounted) return <div className="max-w-4xl mx-auto py-8"><div className="h-96 animate-pulse bg-[#111] rounded-xl" /></div>;
+  if (!mounted) return <div className="max-w-4xl mx-auto py-8"><div className="h-96 animate-pulse bg-gray-100 rounded-xl" /></div>;
 
   const xp = getTotalXP();
   const modulesCompleted = getCompletedModuleCount();
@@ -23,43 +21,39 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <h1 className="text-3xl font-black mb-8">Your Profile</h1>
+      <h1 className="text-3xl font-black mb-8 text-[#1A1F36]">Your Profile</h1>
 
-      {/* Name */}
       <div className="mb-8">
-        <label className="text-sm text-gray-400 mb-1 block">Your Name</label>
-        <input value={name} onChange={e => setName(e.target.value)} onBlur={handleNameBlur}
-          placeholder="Enter your name..." className="w-full max-w-md px-4 py-3 rounded-lg bg-[#111] border border-[#222] focus:border-[#00E6B9] focus:outline-none transition-colors" />
+        <label className="text-sm text-gray-500 mb-1 block">Your Name</label>
+        <input value={name} onChange={e => setName(e.target.value)} onBlur={() => setProfile(name)}
+          placeholder="Enter your name..." className="w-full max-w-md px-4 py-3 rounded-lg bg-white border border-gray-200 focus:border-[#E8192C] focus:outline-none focus:ring-2 focus:ring-[#E8192C]/10 transition-all" />
       </div>
 
-      {/* XP */}
       <div className="mb-8"><XPCounter /></div>
 
-      {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total XP', value: xp, color: '#00E6B9' },
-          { label: 'Modules', value: `${modulesCompleted}/12`, color: '#3B82F6' },
+          { label: 'Total XP', value: xp, color: '#E8192C' },
+          { label: 'Modules', value: `${modulesCompleted}/12`, color: '#0070F3' },
           { label: 'Quizzes', value: quizzesPassed, color: '#8B5CF6' },
-          { label: 'Badges', value: `${badges.filter(b => isBadgeEarned(b.id)).length}/3`, color: '#FFD700' },
+          { label: 'Badges', value: `${badges.filter(b => isBadgeEarned(b.id)).length}/3`, color: '#FFAA00' },
         ].map(s => (
-          <div key={s.label} className="rounded-xl border border-[#222] bg-[#111] p-4 text-center">
+          <div key={s.label} className="rounded-2xl border border-gray-200 bg-white p-4 text-center shadow-sm">
             <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
-            <div className="text-xs text-gray-400">{s.label}</div>
+            <div className="text-xs text-gray-500">{s.label}</div>
           </div>
         ))}
       </div>
 
-      {/* Track Progress */}
-      <h2 className="text-xl font-bold mb-4">Track Progress</h2>
+      <h2 className="text-xl font-bold mb-4 text-[#1A1F36]">Track Progress</h2>
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         {tracks.map(t => {
           const p = getTrackProgress(t.id, t.modules.length);
           return (
-            <div key={t.id} className="rounded-xl border border-[#222] bg-[#111] p-5">
+            <div key={t.id} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-2xl">{t.icon}</span>
-                <span className="font-semibold">{t.title}</span>
+                <span className="font-semibold text-[#1A1F36]">{t.title}</span>
               </div>
               <ProgressBar percentage={p.percentage} color={t.color} showLabel />
             </div>
@@ -67,24 +61,20 @@ export default function ProfilePage() {
         })}
       </div>
 
-      {/* Badges */}
-      <h2 className="text-xl font-bold mb-4">Badges</h2>
+      <h2 className="text-xl font-bold mb-4 text-[#1A1F36]">Badges</h2>
       <div className="grid md:grid-cols-3 gap-4 mb-8">
-        {badges.map(b => (
-          <BadgeCard key={b.id} badge={b} earned={isBadgeEarned(b.id)} earnedDate={getBadgeDate(b.id)} />
-        ))}
+        {badges.map(b => <BadgeCard key={b.id} badge={b} earned={isBadgeEarned(b.id)} earnedDate={getBadgeDate(b.id)} />)}
       </div>
 
-      {/* Activity */}
       {activity.length > 0 && (
         <>
-          <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
+          <h2 className="text-xl font-bold mb-4 text-[#1A1F36]">Recent Activity</h2>
           <div className="space-y-2 mb-8">
             {activity.map((a, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-[#111] border border-[#1a1a1a]">
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-100">
                 <span className="text-lg">{a.type === 'module' ? '📚' : a.type === 'quiz' ? '✅' : '🏆'}</span>
-                <span className="text-sm flex-1">{a.label}</span>
-                <span className="text-xs text-gray-500">{new Date(a.date).toLocaleDateString()}</span>
+                <span className="text-sm flex-1 text-[#1A1F36]">{a.label}</span>
+                <span className="text-xs text-gray-400">{new Date(a.date).toLocaleDateString()}</span>
               </div>
             ))}
           </div>
