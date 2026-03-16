@@ -1,75 +1,95 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { tracks } from '@/data/tracks';
 import { getTrackProgress } from '@/lib/store';
+import ScrollReveal from '@/components/ScrollReveal';
 import ProgressBar from '@/components/ProgressBar';
 
 export default function Home() {
-  const [progress, setProgress] = useState<Record<string, number>>({});
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  useEffect(() => {
-    const p: Record<string, number> = {};
-    tracks.forEach(t => {
-      p[t.id] = getTrackProgress(t.id, t.modules.length).percentage;
-    });
-    setProgress(p);
-  }, []);
+  const steps = [
+    { icon: '📖', title: 'Learn', desc: 'Study each module' },
+    { icon: '✅', title: 'Quiz', desc: 'Test your knowledge' },
+    { icon: '🏆', title: 'Certify', desc: 'Earn your badge' },
+    { icon: '🔗', title: 'Share', desc: 'Show the world' },
+  ];
+
+  const skills = ['ROI Modeling', 'Discovery Questions', '36 Capabilities', 'Maturity Scoring', 'Benefit Stories', 'Workshop Facilitation', 'Executive Deliverables', 'Product Mapping'];
 
   return (
-    <div className="px-6 py-12 max-w-5xl mx-auto">
-      {/* Top right link */}
-      <div className="flex justify-end mb-8">
-        <Link href="/profile" className="text-sm text-gray-400 hover:text-[#00E6B9] transition-colors">
-          👤 Profile
-        </Link>
-      </div>
-
+    <div className="max-w-6xl mx-auto">
       {/* Hero */}
-      <div className="text-center mb-16">
-        <h1 className="text-5xl md:text-6xl font-extrabold mb-4 bg-gradient-to-r from-[#00E6B9] to-[#00B894] bg-clip-text text-transparent">
-          VE Enablement Academy
-        </h1>
-        <p className="text-xl text-gray-400 mb-8">
-          Master Value Engineering. Get Certified.
-        </p>
-        <div className="flex justify-center gap-8 text-sm text-gray-500">
-          <span className="flex items-center gap-2">📚 <strong className="text-white">15</strong> Modules</span>
-          <span className="flex items-center gap-2">❓ <strong className="text-white">75</strong> Quiz Questions</span>
-          <span className="flex items-center gap-2">⏱ <strong className="text-white">~8</strong> Hours</span>
+      <ScrollReveal>
+        <div className="text-center py-16 md:py-24">
+          <h1 className="text-5xl md:text-7xl font-black mb-2">
+            <span className="bg-gradient-to-r from-[#00E6B9] to-[#06b6d4] bg-clip-text text-transparent">VE Enablement</span>
+          </h1>
+          <h1 className="text-5xl md:text-7xl font-black mb-6 text-white">Academy</h1>
+          <p className="text-xl text-gray-400 max-w-2xl mx-auto">Master Ivanti&apos;s Value Engineering Frameworks. Get Certified.</p>
         </div>
-      </div>
+      </ScrollReveal>
 
-      {/* Track cards */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {tracks.map(track => {
-          const pct = progress[track.id] || 0;
-          return (
-            <div
-              key={track.id}
-              className="card-hover rounded-xl border border-[#1a1a1a] bg-[#0d0d0d] p-6 flex flex-col"
-            >
-              <div className="text-4xl mb-3">{track.icon}</div>
-              <h2 className="text-xl font-bold mb-1">{track.title}</h2>
-              <p className="text-sm text-gray-400 mb-4 flex-1">{track.description}</p>
-              <p className="text-xs text-gray-500 mb-2">{track.modules.length} modules</p>
-              <ProgressBar percentage={pct} color={track.color} />
-              <p className="text-xs text-gray-500 mt-1 mb-4">{pct}% complete</p>
-              <Link
-                href={`/tracks/${track.id}`}
-                className="block text-center px-4 py-2.5 rounded-lg font-semibold text-sm transition-colors"
-                style={{
-                  backgroundColor: pct > 0 ? track.color + '22' : '#00E6B9',
-                  color: pct > 0 ? track.color : '#000',
-                }}
-              >
-                {pct > 0 ? 'Continue →' : 'Start Learning →'}
+      {/* Stats */}
+      <ScrollReveal delay={200}>
+        <div className="flex justify-center gap-8 mb-16 text-gray-400">
+          <div className="text-center"><span className="text-2xl font-bold text-white">12</span><br />Modules</div>
+          <div className="text-center"><span className="text-2xl font-bold text-white">60</span><br />Quiz Questions</div>
+          <div className="text-center"><span className="text-2xl font-bold text-white">2</span><br />Certifications</div>
+        </div>
+      </ScrollReveal>
+
+      {/* Tracks */}
+      <ScrollReveal delay={300}>
+        <h2 className="text-3xl font-bold text-center mb-8">Two Frameworks. One Mission.</h2>
+        <div className="grid md:grid-cols-2 gap-6 mb-20">
+          {tracks.map(track => {
+            const progress = mounted ? getTrackProgress(track.id, track.modules.length) : { percentage: 0, completed: 0, total: track.modules.length };
+            return (
+              <Link key={track.id} href={`/learn/${track.id}`} className="card-interactive block rounded-xl border border-[#222] p-8 hover:border-opacity-50"
+                style={{ borderColor: track.color + '40' }}>
+                <div className="text-5xl mb-4">{track.icon}</div>
+                <h3 className="text-2xl font-bold mb-2">{track.title}</h3>
+                <p className="text-gray-400 mb-4">{track.description}</p>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-xs px-3 py-1 rounded-full border border-[#333]">{track.modules.length} Modules</span>
+                  <span className="text-xs px-3 py-1 rounded-full border border-[#333]">200 XP + Capstone</span>
+                </div>
+                <ProgressBar percentage={progress.percentage} color={track.color} />
+                <div className="mt-4 text-sm font-semibold" style={{ color: track.color }}>
+                  {progress.percentage > 0 ? `Continue → ${progress.percentage}%` : 'Start Learning →'}
+                </div>
               </Link>
+            );
+          })}
+        </div>
+      </ScrollReveal>
+
+      {/* How It Works */}
+      <ScrollReveal delay={200}>
+        <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-20">
+          {steps.map((s, i) => (
+            <div key={i} className="text-center p-6 rounded-xl border border-[#222] bg-[#111]">
+              <div className="text-3xl mb-2">{s.icon}</div>
+              <div className="font-bold mb-1">{s.title}</div>
+              <div className="text-xs text-gray-400">{s.desc}</div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </ScrollReveal>
+
+      {/* Skills */}
+      <ScrollReveal delay={200}>
+        <h2 className="text-3xl font-bold text-center mb-8">Skills You&apos;ll Master</h2>
+        <div className="flex flex-wrap justify-center gap-3 mb-16">
+          {skills.map(s => (
+            <span key={s} className="px-4 py-2 rounded-full border border-[#333] text-sm text-gray-300 bg-[#111] hover:border-[#00E6B9] hover:text-[#00E6B9] transition-colors">{s}</span>
+          ))}
+        </div>
+      </ScrollReveal>
     </div>
   );
 }

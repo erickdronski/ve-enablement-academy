@@ -1,113 +1,109 @@
 'use client';
-
 import { useState } from 'react';
 import { QuizQuestion } from '@/data/tracks';
 import { saveQuizScore } from '@/lib/store';
 
-interface QuizEngineProps {
-  questions: QuizQuestion[];
-  trackId: string;
-  moduleId: string;
-  onComplete: (score: number, total: number) => void;
-}
+export default function QuizEngine({ questions, moduleId, trackId, onComplete }: {
+  questions: QuizQuestion[]; moduleId: string; trackId: string; onComplete: (passed: boolean, score: number) => void;
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [answers, setAnswers] = useState<number[]>([]);
+  const [isComplete, setIsComplete] = useState(false);
+  const [started, setStarted] = useState(false);
 
-export default function QuizEngine({ questions, trackId, moduleId, onComplete }: QuizEngineProps) {
-  const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
-
-  const q = questions[current];
-  const answered = selected !== null;
-  const isCorrect = selected === q?.correctIndex;
-
-  function handleSelect(idx: number) {
-    if (answered) return;
-    setSelected(idx);
-    if (idx === q.correctIndex) setScore(s => s + 1);
-  }
-
-  function handleNext() {
-    if (current + 1 >= questions.length) {
-      const finalScore = score + (isCorrect ? 0 : 0); // score already updated
-      saveQuizScore(trackId, moduleId, score, questions.length);
-      setFinished(true);
-      onComplete(score, questions.length);
-    } else {
-      setCurrent(c => c + 1);
-      setSelected(null);
-    }
-  }
-
-  if (finished) {
-    const passed = score >= Math.ceil(questions.length * 0.8);
+  if (!started) {
     return (
-      <div className="text-center py-12">
-        {passed && (
-          <div className="text-6xl mb-4 animate-bounce">🎉</div>
-        )}
-        <h3 className="text-2xl font-bold mb-2">
-          {passed ? 'Congratulations!' : 'Keep Practicing!'}
-        </h3>
-        <p className="text-lg text-gray-300 mb-2">
-          You scored <span className="font-bold text-white">{score}</span> out of{' '}
-          <span className="font-bold text-white">{questions.length}</span>
+      <button onClick={() => setStarted(true)} className="px-6 py-3 rounded-lg font-semibold text-black transition-all hover:scale-105" style={{ backgroundColor: '#00E6B9' }}>
+        Start Quiz ({questions.length} questions)
+      </button>
+    );
+  }
+
+  const q = questions[currentIndex];
+  const score = answers.reduce((s, a, i) => s + (a === questions[i].correctIndex ? 1 : 0), 0) + (isComplete ? 0 : 0);
+
+  if (isComplete) {
+    const finalScore = answers.reduce((s, a, i) => s + (a === questions[i].correctIndex ? 1 : 0), 0);
+    const passed = finalScore >= Math.ceil(questions.length * 0.8);
+    const stars = finalScore === questions.length ? '★★★' : passed ? '★★' : '★';
+    return (
+      <div className="text-center py-8">
+        <div className="text-6xl mb-4">{passed ? '🎉' : '📝'}</div>
+        <div className="text-4xl font-bold mb-2">{stars}</div>
+        <h3 className="text-2xl font-bold mb-2">{finalScore}/{questions.length} Correct</h3>
+        <p className={`text-lg mb-6 ${passed ? 'text-green-400' : 'text-red-400'}`}>
+          {passed ? 'You passed! Great job!' : 'Not quite — you need 80% to pass.'}
         </p>
-        <p className={`text-sm font-semibold ${passed ? 'text-green-400' : 'text-red-400'}`}>
-          {passed ? '✅ PASSED (80%+ required)' : '❌ FAILED — 80% required to pass'}
-        </p>
-        {passed && (
-          <div className="mt-6 flex justify-center gap-2 text-4xl">
-            {'🎊✨🏆✨🎊'.split('').map((e, i) => (
-              <span key={i} className="animate-pulse" style={{ animationDelay: `${i * 0.15}s` }}>{e}</span>
-            ))}
-          </div>
+        {passed ? (
+          <div className="inline-block px-4 py-2 rounded-full text-sm font-semibold" style={{ backgroundColor: '#00E6B920', color: '#00E6B9' }}>+25 XP earned</div>
+        ) : (
+          <button onClick={() => { setCurrentIndex(0); setSelectedAnswer(null); setAnswers([]); setIsComplete(false); }}
+            className="px-6 py-3 rounded-lg font-semibold bg-[#222] hover:bg-[#333] transition-all">Retake Quiz</button>
         )}
       </div>
     );
   }
 
+  const handleSelect = (idx: number) => {
+    if (selectedAnswer !== null) return;
+    setSelectedAnswer(idx);
+  };
+
+  const handleNext = () => {
+    if (selectedAnswer === null) return;
+    const newAnswers = [...answers, selectedAnswer];
+    setAnswers(newAnswers);
+    setSelectedAnswer(null);
+    if (currentIndex + 1 >= questions.length) {
+      const finalScore = newAnswers.reduce((s, a, i) => s + (a === questions[i].correctIndex ? 1 : 0), 0);
+      saveQuizScore(trackId, moduleId, finalScore, questions.length);
+      const passed = finalScore >= Math.ceil(questions.length * 0.8);
+      onComplete(passed, finalScore);
+      setIsComplete(true);
+    } else {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">
-          Question {current + 1} of {questions.length}
-        </h3>
-        <span className="text-sm text-gray-500">{score} correct so far</span>
+      <div className="flex items-center gap-2 mb-6">
+        <span className="text-sm text-gray-400">Question {currentIndex + 1} of {questions.length}</span>
+        <div className="flex gap-1 ml-auto">
+          {questions.map((_, i) => (
+            <div key={i} className={`w-2 h-2 rounded-full ${i < currentIndex ? 'bg-green-500' : i === currentIndex ? 'bg-[#00E6B9]' : 'bg-[#333]'}`} />
+          ))}
+        </div>
       </div>
-      <p className="text-lg font-medium text-white mb-6">{q.question}</p>
-      <div className="space-y-3">
-        {q.options.map((opt, idx) => {
-          let classes = 'w-full text-left px-4 py-3 rounded-lg border transition-all duration-200 ';
-          if (!answered) {
-            classes += 'border-[#222] bg-[#111] hover:border-[#00E6B9] hover:bg-[#0a1a1a] cursor-pointer';
-          } else if (idx === q.correctIndex) {
-            classes += 'border-green-500 bg-green-500/10 text-green-300';
-          } else if (idx === selected) {
-            classes += 'border-red-500 bg-red-500/10 text-red-300';
-          } else {
-            classes += 'border-[#222] bg-[#111] opacity-50';
+      <h4 className="text-xl font-semibold mb-4">{q.question}</h4>
+      <div className="space-y-3 mb-4">
+        {q.options.map((opt, i) => {
+          let borderColor = '#222';
+          let bg = 'bg-[#111]';
+          if (selectedAnswer !== null) {
+            if (i === q.correctIndex) { borderColor = '#22c55e'; bg = 'bg-green-500/10'; }
+            else if (i === selectedAnswer) { borderColor = '#ef4444'; bg = 'bg-red-500/10'; }
           }
           return (
-            <button key={idx} onClick={() => handleSelect(idx)} className={classes}>
-              <span className="font-semibold mr-2">{String.fromCharCode(65 + idx)}.</span>
-              {opt}
+            <button key={i} onClick={() => handleSelect(i)} disabled={selectedAnswer !== null}
+              className={`w-full text-left p-4 rounded-lg border transition-all ${bg} ${selectedAnswer === null ? 'hover:border-[#00E6B9] hover:bg-[#00E6B9]/5 cursor-pointer' : ''}`}
+              style={{ borderColor }}>
+              <span className="text-gray-400 mr-3">{String.fromCharCode(65 + i)}.</span>{opt}
+              {selectedAnswer !== null && i === q.correctIndex && <span className="float-right text-green-400">✓</span>}
+              {selectedAnswer !== null && i === selectedAnswer && i !== q.correctIndex && <span className="float-right text-red-400">✗</span>}
             </button>
           );
         })}
       </div>
-      {answered && (
-        <div className={`mt-4 p-4 rounded-lg text-sm ${isCorrect ? 'bg-green-500/10 border border-green-500/30 text-green-300' : 'bg-red-500/10 border border-red-500/30 text-red-300'}`}>
-          <p className="font-semibold mb-1">{isCorrect ? '✅ Correct!' : '❌ Incorrect'}</p>
-          <p className="text-gray-300">{q.explanation}</p>
+      {selectedAnswer !== null && (
+        <div className="mb-4 p-4 rounded-lg border border-[#333] bg-[#111]">
+          <p className="text-sm text-gray-300">{q.explanation}</p>
         </div>
       )}
-      {answered && (
-        <button
-          onClick={handleNext}
-          className="mt-6 px-6 py-2.5 bg-[#00E6B9] text-black font-semibold rounded-lg hover:bg-[#00ccaa] transition-colors"
-        >
-          {current + 1 >= questions.length ? 'See Results' : 'Next Question →'}
+      {selectedAnswer !== null && (
+        <button onClick={handleNext} className="px-6 py-2 rounded-lg font-semibold text-black" style={{ backgroundColor: '#00E6B9' }}>
+          {currentIndex + 1 >= questions.length ? 'See Results' : 'Next Question →'}
         </button>
       )}
     </div>
